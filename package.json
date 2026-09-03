@@ -1,0 +1,43 @@
+{
+  "name": "share-screen",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local network screen sharing using WebRTC",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently -k -n server,client -c blue,green \"node --watch server.js\" \"vite --host\"",
+    "build": "vite build",
+    "start": "node server.js",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "webrtc",
+    "screen-share",
+    "local-network"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "@vitejs/plugin-react": "^5.1.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "terser": "^5.51.2",
+    "vite": "^7.2.2"
+  }
+}

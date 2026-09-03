@@ -1,0 +1,8 @@
+node_modules
+dist
+.git
+deploy.sh
+*.log
+README.md
+ARCHITECTURE.md
+LICENSE

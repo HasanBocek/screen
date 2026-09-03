@@ -1,0 +1,40 @@
+# Dokploy docker-compose deployment for ShareScreen
+# Single service: Express serves the built SPA + WebSocket signaling on one port.
+#
+# Domain: attach it in Dokploy UI (Domains tab) OR keep the traefik labels below
+# and set the SHARESCREEN_DOMAIN env var in Dokploy (e.g. screen.example.com).
+#
+# NOTE: WebRTC media flows peer-to-peer (STUN only). Traefik must forward the
+# WebSocket upgrade (it does by default). No extra port mappings needed.
+
+services:
+  sharescreen:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    expose:
+      - "3000"
+    labels:
+      - traefik.enable=true
+      # Router: host rule from SHARESCREEN_DOMAIN, HTTPS entrypoint + LE certs
+      - traefik.http.routers.sharescreen.rule=Host(`${SHARESCREEN_DOMAIN}`)
+      - traefik.http.routers.sharescreen.entrypoints=websecure
+      - traefik.http.routers.sharescreen.tls.certresolver=letsencrypt
+      - traefik.http.routers.sharescreen.service=sharescreen
+      # HTTP -> HTTPS redirect handled globally by Dokploy's Traefik; explicit per-app redirect:
+      - traefik.http.routers.sharescreen-web.rule=Host(`${SHARESCREEN_DOMAIN}`)
+      - traefik.http.routers.sharescreen-web.entrypoints=web
+      - traefik.http.routers.sharescreen-web.middlewares=https-redirect@file
+      - traefik.http.routers.sharescreen-web.service=sharescreen
+      # Service: container port
+      - traefik.http.services.sharescreen.loadbalancer.server.port=3000
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
